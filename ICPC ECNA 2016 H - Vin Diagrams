@@ -1,0 +1,159 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+
+using namespace std;
+
+#define ii pair<int,int>
+#define PI 3.14159265358979323846264338327950288
+
+int Y,X;
+int aY,aX,bY,bX;
+vector<ii> inter;
+
+string tab[100];
+bool vis[100][100];
+vector<ii> pA , pB;
+int dirY[8] = {0,1,0,-1,1,1,-1,-1};
+int dirX[8] = {1,0,-1,0,1,-1,-1,1};
+
+int s=0;
+bool f(const ii &a,const ii &b)
+{
+    return a.first == b.first;
+}
+
+void dfs(int y,int x)
+{
+    if(vis[y][x])return;
+    vis[y][x]=true;
+    s++;
+    for(int d=0;d<4;d++)
+    {
+        int yy = y + dirY[d];
+        int xx = x + dirX[d];
+        if(0<=yy && yy<Y && 0<=xx && xx<X && tab[yy][xx]=='.')
+            dfs(yy,xx);
+    }
+}
+
+double angle(int y0,int x0,int y1,int x1)
+{
+    double ang = atan2(y1,x1) - atan2(y0,x0);
+    while(ang > PI)ang -= 2*PI;
+    while(ang < -PI)ang += 2*PI;
+    return ang;
+}
+
+bool inside(ii pos,vector<ii> &pol)
+{
+    int y = pos.first;
+    int x = pos.second;
+    double sum = 0;
+    int sz = (int)pol.size();
+    for(int i=0;i<sz;i++)
+    {
+        int yy = pol[i].first;
+        int xx = pol[i].second;
+        int yyy = pol[(i+1)%sz].first;
+        int xxx = pol[(i+1)%sz].second;
+        sum += angle(yy-y,xx-x,yyy-y,xxx-x);
+    }
+
+    return fabs(sum) >= PI;
+}
+
+void getPolygon(ii pos,vector<ii> &pol)
+{
+    int y = pos.first;
+    int x = pos.second;
+    int d = 0;
+    int fail = 0;
+    while(fail < 4)
+    {
+        int yy = y + dirY[d];
+        int xx = x + dirX[d];
+        if(0<=yy && yy<Y && 0<=xx && xx<X && tab[yy][xx]!='.' && !vis[yy][xx])
+        {
+            vis[yy][xx] = true;
+            pol.push_back(ii(yy,xx));
+            y = yy;
+            x = xx;
+            fail = 0;
+        }
+        else
+        {
+            d = (d+1)%4;
+            fail++;
+        }
+    }
+}
+
+int main()
+{
+    cout.sync_with_stdio(0);
+    cout.tie(NULL);
+    cin.sync_with_stdio(0);
+    cin.tie(NULL);
+
+    cin >> Y >> X;
+    for(int y=0;y<Y;y++)
+    {
+        cin >> tab[y];
+        for(int x=0;x<X;x++)
+        {
+            if(tab[y][x]=='A')aY=y,aX=x;
+            else if(tab[y][x]=='B')bY=y,bX=x;
+
+            int nb=0;
+            for(int d=0;d<4 && tab[y][x]=='X';d++)
+            {
+                int yy = y+dirY[d];
+                int xx = x+dirX[d];
+                nb += (0 <= yy && yy < Y && 0 <= xx && xx < X && tab[yy][xx]=='X');
+            }
+
+            if(nb==4)
+                inter.push_back(ii(y,x));
+        }
+    }
+
+
+    getPolygon(ii(aY,aX),pA);
+    int sa = (int)pA.size();
+    for(int y=0;y<Y;y++)
+        for(int x=0;x<X;x++)
+            vis[y][x]=false;
+
+    getPolygon(ii(bY,bX),pB);
+    int sb = pB.size();
+    for(int y=0;y<Y;y++)
+        for(int x=0;x<X;x++)
+            vis[y][x]=false;
+
+    int SA=0 , SB=0 , AB=0;
+
+    for(int y=0;y<Y;y++)
+        for(int x=0;x<X;x++)
+        {
+            if(tab[y][x]!='.')continue;
+
+            dfs(y,x);
+            if(s==0)continue;
+
+
+            bool aa = inside(ii(y,x),pA);
+            bool bb = inside(ii(y,x),pB);
+
+            if(aa&&bb)AB=s;
+            else if(aa)SA=s;
+            else if(bb)SB=s;
+
+            s=0;
+        }
+
+    cout << SA << ' ' << SB << ' ' << AB;
+
+    return 0;
+}

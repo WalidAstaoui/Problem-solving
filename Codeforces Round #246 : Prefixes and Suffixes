@@ -1,0 +1,71 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+ 
+using namespace std;
+ 
+struct suff
+{
+    int index;
+    int rk[2];
+};
+ 
+bool comp(const suff &a, const suff &b)
+{
+    return (make_pair(a.rk[0],a.rk[1])) < (make_pair(b.rk[0],b.rk[1]));
+}
+ 
+int main()
+{
+    string s;
+    cin >> s;
+    int N = s.size();
+    suff suffs[N];
+    for(int i=0;i<N;i++)
+    {
+        suffs[i].index = i;
+        suffs[i].rk[0] = s[i]-'A';
+        suffs[i].rk[1] = (i+1 < N ? s[i+1]-'A' : -1);
+    }
+    sort(suffs,suffs+N,comp);
+    int ind[N];
+ 
+    for(int k=4;k<2*N;k*=2)
+    {
+        int lastRank = suffs[0].rk[0];
+        ind[suffs[0].index] = 0;
+        for(int i=1;i<N;i++)
+        {
+            ind[suffs[i].index] = i;
+            bool add = !(suffs[i].rk[0] == lastRank && suffs[i].rk[1] == suffs[i-1].rk[1]);
+            lastRank = suffs[i].rk[0];
+            suffs[i].rk[0] = suffs[i-1].rk[0] + add;
+        }
+        for(int i=0;i<N;i++)
+        {
+            int nextIndex = suffs[i].index + k/2;
+            suffs[i].rk[1] = (nextIndex < N ? suffs[ind[nextIndex]].rk[0] : -1);
+        }
+        sort(suffs,suffs+N,comp);
+    }
+ 
+    for(int i=0;i<N;ind[suffs[i].index]=i,i++);
+ 
+    int l = 0;
+    int r = N-1;
+    vector<pair<int,int>> all;
+    for(int n=0;n<N;n++)
+    {
+        while(l<=r && (suffs[l].index+n >= N || s[suffs[l].index+n] < s[n]))
+            l++;
+        while(l<=r && (suffs[r].index+n >= N || s[suffs[r].index+n] > s[n]))
+            r--;
+        if(l <= ind[N-1-n] && ind[N-1-n] <= r)
+            all.push_back(make_pair(n+1,r-l+1));
+    }
+    cout << all.size() << '\n';
+    for(pair<int,int> &p : all)
+        cout << p.first << ' ' << p.second << '\n';
+ 
+    return 0;
+}

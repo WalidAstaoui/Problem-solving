@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+#define MAXN 1000001
+#define ll long long
+using namespace std;
+int N, l, r;
+vector <ll> temp;
+ll T[2000000];
+void update(int p, ll &v) {
+    p += N;
+    for (T[p] = max(T[p], v); p > 1; p >>= 1) T[p>>1] = max(T[p], T[p^1]);
+}
+
+ll query(int l, int r) {
+    if (l > r) return 0;
+    ll best = 0;
+    for (l += N, r += N; l < r; l >>= 1, r >>= 1) {
+        if (l&1) best = max(best, T[l++]);
+        if (r&1) best = max(best, T[--r]);
+    }
+    return best;
+}
+
+ll maxBest = 0, curbest, v;
+ll wt[MAXN];
+
+int main() {
+    scanf("%d", &N);
+    for (int i = 0; i < N; i++)
+    {
+        scanf("%lld", &wt[i]);
+        temp.push_back(wt[i]);
+    }
+
+    sort(temp.begin(), temp.end());
+    temp.erase(unique(temp.begin(), temp.end()), temp.end());
+
+    for (int i = 0; i < N; i++)
+        wt[i] = lower_bound(temp.begin(), temp.end(), wt[i]) - temp.begin();
+
+    r = temp.size();
+    temp.clear();
+
+    for (int i = 0; i < N; i++) {
+        scanf("%lld", &v);
+        l = wt[i] + 1;
+        curbest = v + query(l, r);
+        maxBest = max(maxBest, curbest);
+        update(l-1, curbest);
+    }
+    printf("%lld\n", maxBest);
+}

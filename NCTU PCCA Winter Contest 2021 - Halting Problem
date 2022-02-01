@@ -1,0 +1,66 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define endl "\n"
+#define pii pair<int,int>
+#define pb push_back
+#define x first
+#define y second
+#define sz(x) ((int)(x).size())
+#define mp make_pair
+
+typedef long long int ll;
+const int N=2e5+7;
+
+vector<int> adj[N];
+int col[N];
+bool cycle;
+void color(int u,int c){
+	if(col[u]==-1) {
+		col[u]=c;
+	}
+	for(int d:adj[u]) {
+		if(col[d]==c) {
+			cycle=true;
+			return;
+		}
+		if(col[d]==-1) {
+			color(d,c^1);
+		}
+	}
+}
+
+int main()
+{
+ 
+	ios_base:: sync_with_stdio(false); cin.tie(0);
+	int n,m,k; cin>>n>>m>>k;
+	for(int i=1; i<=m; i++) {
+		int u,v; cin>>u>>v;
+		adj[u].push_back(v);
+		adj[v].push_back(u);
+	}
+	if(k>=3) {
+		cout<<1<<endl;
+		return 0;
+	}
+	if(k==1) {
+		cout<<n<<endl;
+		return 0;
+	}
+	memset(col,-1,sizeof col);
+	color(1,0);
+	if(cycle) {
+		cout<<1<<endl;
+	}
+	else{
+		int cnt=0;
+		for(int i=1; i<=n; i++) {
+			cnt+=(col[i]);
+		}
+		cout<<max(cnt,n-cnt)<<endl;
+	}
+  
+	return 0;
+}

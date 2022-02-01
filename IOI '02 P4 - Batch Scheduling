@@ -1,0 +1,53 @@
+#include <cstdio>
+#include <vector>
+
+using namespace std;
+
+#define min(a,b) (a<b?a:b)
+#define ii pair<int,int>
+
+const int oo = (1<<30)-1 , NMAX = 1e4;
+
+int N,S;
+vector<int> T,F;
+vector<int> TT,FF;
+
+int dp[10000];
+
+int process(int n)
+{
+    if(n==N) return 0;
+    if(dp[n]!=-1) return dp[n];
+
+    int ans = oo;
+    int nextT = 0,cost = 0;
+    for(int m=n+1;m<=N;m++)
+    {
+        nextT = S+TT[m-1] - (n>0?TT[n-1]:0);
+        cost = (nextT)*(FF[N-1] - (n>0?FF[n-1]:0));
+        ans = min(ans,cost+process(m));
+    }
+
+    return dp[n] = ans;
+}
+
+int main()
+{
+    scanf("%d%d",&N,&S);
+    T.resize(N);
+    F.resize(N);
+    TT.resize(N);
+    FF.resize(N);
+
+    for(int n=0;n<N;n++)
+    {
+        scanf("%d%d",&T[n],&F[n]);
+        TT[n] = T[n] + (n>0?TT[n-1]:0);
+        FF[n] = F[n] + (n>0?FF[n-1]:0);
+        dp[n]=-1;
+    }
+
+    printf("%d",process(0));
+
+    return 0;
+}

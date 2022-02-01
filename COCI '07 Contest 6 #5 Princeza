@@ -1,0 +1,94 @@
+#include <cstdio>
+#include <set>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+#define ii pair<int,int>
+
+const int M = 1000000000;
+
+int N,K;
+char dir[100001];
+set<ii> AD,BC;
+set<ii>::iterator itAD;
+set<ii>::iterator itBC;
+
+int main()
+{
+    scanf("%d%d",&N,&K);
+    scanf("%s",dir);
+
+    int Y,X;
+
+    for(int n=0;n<N;n++)
+    {
+        int x,y;
+        scanf("%d%d",&x,&y);
+        if(n==0)X=x,Y=y;
+        AD.insert(ii(y+(M-x),y));
+        BC.insert(ii(y+x,y));
+    }
+
+    for(int k=0;k<K;k++)
+    {
+        char c = dir[k];
+
+        itAD = AD.find(ii(Y+(M-X),Y));
+        itBC = BC.find(ii(Y+X,Y));
+
+        if(c == 'A')
+        {
+            ++itAD;
+            if(itAD == AD.end())continue;
+            ii next = *itAD;
+            if(Y+(M-X)!=next.first)continue;
+            Y = next.second;
+            X = M-next.first+next.second;
+            --itAD;
+            AD.erase(itAD);
+            BC.erase(itBC);
+        }
+        else if(c == 'B')
+        {
+            if(itBC == BC.begin())continue;
+            --itBC;
+            ii next = *itBC;
+            if(Y+X!=next.first)continue;
+            Y = next.second;
+            X = next.first-next.second;
+            ++itBC;
+            AD.erase(itAD);
+            BC.erase(itBC);
+        }
+        else if(c == 'C')
+        {
+            ++itBC;
+            if(itBC == BC.end())continue;
+            ii next = *itBC;
+            if(Y+X!=next.first)continue;
+            Y = next.second;
+            X = next.first-next.second;
+            --itBC;
+            AD.erase(itAD);
+            BC.erase(itBC);
+        }
+        else
+        {
+            if(itAD == AD.begin())continue;
+            --itAD;
+            ii next = *itAD;
+            if(Y+(M-X)!=next.first)continue;
+            Y = next.second;
+            X = M-next.first+next.second;
+            ++itAD;
+            AD.erase(itAD);
+            BC.erase(itBC);
+        }
+    }
+
+    printf("%d %d",X,Y);
+
+    return 0;
+}

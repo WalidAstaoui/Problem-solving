@@ -1,0 +1,109 @@
+#include <vector>
+
+using namespace std;
+
+const int NMAX = 2e5;
+int arr[NMAX][2];
+
+void query(int n,int &a,int &b)
+{
+    if(arr[n][0] + arr[n][1] != 0)
+    {
+        a = arr[n][0] , b = arr[n][1];
+        return;
+    }
+    vector<int> ans = ask(n);
+    arr[n][0] = a = ans[0] ,arr[n][1] = b = ans[1];
+}
+
+int all = 0;
+int sol = -1;
+
+void recur(int l,int r)
+{
+    if(sol!=-1)return;
+    if(r<l)return;
+    if(l==r)
+    {
+        int fa,fb;
+        query(l,fa,fb);
+        if(fa+fb==0)
+        {
+            sol = l;
+        }
+        return;
+    }
+
+    int ll = l , rr = r;
+    int ra,rb;
+    while(l<rr)
+    {
+        query(rr,ra,rb);
+        if(ra+rb==0)
+        {
+            sol = rr;
+            return;
+        }
+        if(ra+rb==all)
+            break;
+        rr--;
+    }
+    int la,lb;
+    while(ll<rr)
+    {
+        query(ll,la,lb);
+        if(la+lb==0)
+        {
+            sol = ll;
+            return;
+        }
+        if(la+lb==all)
+            break;
+        ll++;
+    }
+
+    int mid = (ll+rr)>>1;
+    int ml = mid, mr = mid;
+    int mla,mlb , mra,mrb;
+    while(ll<ml)
+    {
+        query(ml,mla,mlb);
+        if(mla+mlb==0)
+        {
+            sol = ml;
+            return;
+        }
+        if(mla+mlb==all)
+            break;
+        ml--;
+    }
+    while(mr<rr)
+    {
+        query(mr,mra,mrb);
+        if(mra+mrb==0)
+        {
+            sol = mr;
+            return;
+        }
+        if(mra+mrb==all)
+            break;
+        mr++;
+    }
+
+    if(mla-la>0)recur(ll,ml);
+    if(mlb-rb>0)recur(mr,rr);
+}
+
+int find_best(int N)
+{
+    for(int n=N-1;n>=N-500;n--)
+    {
+        int a,b;
+        query(n,a,b);
+        if(a+b==0)return n;
+        all = max(all,a+b);
+    }
+
+    recur(0,N-1);
+    return sol;
+}

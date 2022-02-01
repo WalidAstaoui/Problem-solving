@@ -1,0 +1,59 @@
+#include <bits/stdc++.h>
+ 
+using namespace std;
+ 
+int k_xor(int k, int a, int b)
+{
+    vector<int> d;
+    while(a != 0 || b != 0)
+    {
+        d.push_back((a+b) % k);
+        a /= k;
+        b /= k;
+    }
+ 
+    int s = 0;
+    for(int i = d.size()-1;i>=0;i--)
+        s = k*s + d[i];
+    return s;
+}
+ 
+int inv_xor(int k, int a)
+{
+    vector<int> d;
+    while(a != 0)
+    {
+        d.push_back((-(a % k) + k) % k);
+        a /= k;
+    }
+ 
+    int s = 0;
+    for(int i = d.size()-1;i>=0;i--)
+        s = k*s + d[i];
+    return s;
+}
+ 
+int main()
+{
+    int T;
+    cin >> T;
+    for(int t=0;t<T;t++)
+    {
+        int N;
+        cin >> N;
+        int k;
+        cin >> k;
+ 
+        for(int n=0;n<N;n++)
+        {
+            int y = (n == 0 ? 0 : (n%2 ? k_xor(k,inv_xor(k, n),n-1) : k_xor(k, n, inv_xor(k, n-1))));
+            cout << y << '\n';
+            cout.flush();
+            int r;
+            cin >> r;
+            if(r != 0)
+                break;
+        }
+    }
+    return 0;
+}

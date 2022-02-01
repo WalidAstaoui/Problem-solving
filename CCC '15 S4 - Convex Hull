@@ -1,0 +1,81 @@
+#include <cstdio>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+#define max(a,b) (a>b?a:b)
+#define min(a,b) (a<b?a:b)
+#define ii pair<int,int>
+
+struct Edge
+{
+    int b,t,h;
+};
+
+const int oo = 1e9 , VMAX = 2e3 , HMAX = 2e2 , EMAX = 1e4;
+
+int H,V,E;
+int A,B;
+vector<Edge> adj[VMAX+10];
+int T[VMAX+10][HMAX+10];
+priority_queue<ii,vector<ii>,greater<ii>> Q;
+
+int main()
+{
+    scanf("%d%d%d",&H,&V,&E);
+
+    for(int v=1;v<=V;v++)
+        for(int h=0;h<H;h++)
+            T[v][h] = oo;
+
+    for(int e=0;e<E;e++)
+    {
+        int a,b,t,h;
+        scanf("%d%d%d%d",&a,&b,&t,&h);
+        adj[a].push_back(Edge{b,t,h});
+        adj[b].push_back(Edge{a,t,h});
+    }
+
+    scanf("%d%d",&A,&B);
+    for(int h=0;h<H;h++)T[A][h]=0;
+
+    Q.push(ii(0,A));
+
+    while(!Q.empty())
+    {
+        int u = Q.top().second;
+        Q.pop();
+
+        int sz = (int)adj[u].size();
+        for(int i=0;i<sz;i++)
+        {
+            int v = adj[u][i].b;
+            int t = adj[u][i].t;
+            int h = adj[u][i].h;
+
+            bool add = false;
+            int minT = oo;
+
+            for(int hh=0;hh+h<H;hh++)
+            {
+                if(T[v][hh+h]>T[u][hh]+t)
+                {
+                    T[v][hh+h] = T[u][hh]+t;
+                    minT = min(minT,T[v][hh+h]);
+                    add = true;
+                }
+            }
+
+            if(add)Q.push(ii(minT,v));
+        }
+    }
+
+    int ans = 2*oo;
+    for(int h=0;h<H;h++)
+        ans = min(ans,T[B][h]);
+
+    printf("%d",ans>=oo?-1:ans);
+
+    return 0;
+}

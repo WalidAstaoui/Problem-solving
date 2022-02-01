@@ -1,0 +1,59 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define pii pair<int,int>
+#define pb push_back
+#define x first
+#define y second
+#define sz(x) ((int)(x).size())
+#define mp make_pair
+typedef long long int ll;
+ 
+int query(int x,int y){
+	cout<<"? "<<x<<" "<<y<<endl;
+	int a; cin>>a;
+	return a;
+}
+
+int main()
+{
+ 
+	ios_base:: sync_with_stdio(false); cin.tie(0);
+	int n; cin>>n;
+	bool fl=false;
+	int idxb=0;
+	int idxa=0;
+	for(int i=0; i<n; i++) {
+		int a=query(0,i);
+		if(a==n) {
+			idxb=i;
+		}
+		if(a!=n) {
+			fl=true;
+		}
+	}
+	if(fl) {
+		int cur=0;
+		if(cur==idxb) {
+			cur++;
+		}
+		for(int i=0; i<n; i++) {
+			if(query(i,cur)==n) {
+				idxa=i;
+				break;
+			}
+		}
+	}
+	else{
+		idxa=0;
+		for(int i=0; i<n; i++) {
+			if(query(1,i)==n) {
+				idxb=i;
+			}
+		}
+	}
+//	cout<<idxa<<" "<<idxb<<endl;
+	cout<<"! "<<(idxb-idxa+n)%n<<endl;
+	return 0;
+}

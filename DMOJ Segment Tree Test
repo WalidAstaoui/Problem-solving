@@ -1,0 +1,117 @@
+#include <cstdio>
+#include <utility>
+
+using namespace std;
+
+#define min(a,b) (a<b?a:b)
+#define ii pair<int,int>
+
+int GCD(int a,int b)
+{
+    if(a==0)return b;
+    return GCD(b%a,a);
+}
+
+struct Node
+{
+    int mini;
+    int gcd;
+    int nb;
+};
+
+int arr[100000];
+Node tree[4*100000+1];
+
+void build(int p,int l,int r)
+{
+    if(l==r)
+    {
+        tree[p].mini = arr[l];
+        tree[p].gcd = arr[l];
+        tree[p].nb = 1;
+        return;
+    }
+
+    int mid = (l+r)>>1;
+
+    build(p<<1,l,mid);
+    build(1+(p<<1),mid+1,r);
+
+    tree[p].mini = min(tree[p<<1].mini,tree[1+(p<<1)].mini);
+    tree[p].gcd = GCD(tree[p<<1].gcd,tree[1+(p<<1)].gcd);
+    tree[p].nb = (tree[p].gcd==tree[p<<1].gcd)*tree[p<<1].nb + (tree[p].gcd==tree[1+(p<<1)].gcd)*tree[1+(p<<1)].nb;
+}
+
+ii query(int p,int l,int r,int i,int j,char c)
+{
+    if(r<i || j<l)
+    {
+        if(c=='M')return ii(1e9+1,0);
+        if(c=='G')return ii(0,0);
+        return ii(0,0);
+    }
+    if(i<=l && r<=j)
+    {
+        if(c=='M')return ii(tree[p].mini,0);
+        if(c=='G')return ii(tree[p].gcd,0);
+        return ii(tree[p].nb,tree[p].gcd);
+    }
+
+    int mid = (l+r)>>1;
+    ii a = query(p<<1,l,mid,i,j,c);
+    ii b = query(1+(p<<1),mid+1,r,i,j,c);
+
+    if(c=='M')return ii(min(a.first,b.first),0);
+    if(c=='G')return ii(GCD(a.first,b.first),0);
+    int gcd = GCD(a.second,b.second);
+    return ii((gcd==a.second)*a.first + (gcd==b.second)*b.first,gcd);
+}
+
+void update(int p,int l,int r,int i,int v)
+{
+    if(i<l || r<i)return;
+
+    if(l==r)
+    {
+        tree[p].mini = v;
+        tree[p].gcd = v;
+        tree[p].nb = 1;
+        return;
+    }
+
+    int mid = (l+r)>>1;
+    update(p<<1,l,mid,i,v);
+    update(1+(p<<1),mid+1,r,i,v);
+
+    tree[p].mini = min(tree[p<<1].mini,tree[1+(p<<1)].mini);
+    tree[p].gcd = GCD(tree[p<<1].gcd,tree[1+(p<<1)].gcd);
+    tree[p].nb = (tree[p].gcd==tree[p<<1].gcd)*tree[p<<1].nb + (tree[p].gcd==tree[1+(p<<1)].gcd)*tree[1+(p<<1)].nb;
+}
+
+int main()
+{
+    int N,Q;
+    scanf("%d%d",&N,&Q);
+
+    for(int n=0;n<N;n++)scanf("%d",&arr[n]);
+    build(1,0,N-1);
+
+    for(int q=0;q<Q;q++)
+    {
+        char com[2];
+        scanf("%s",com);
+        if(com[0]=='C')
+        {
+            int i,v;
+            scanf("%d%d",&i,&v);
+            update(1,0,N-1,i-1,v);
+        }
+        else
+        {
+            int l,r;
+            scanf("%d%d",&l,&r);
+            printf("%d\n",query(1,0,N-1,l-1,r-1,com[0]).first);
+        }
+    }
+    return 0;
+}

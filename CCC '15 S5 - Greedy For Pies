@@ -37,6 +37,7 @@ int best(int n,int l,int r,bool ok)
     return dp[n][l][r][ok] = ans;
 }
 
+
 int main()
 {
     scanf("%d",&N);

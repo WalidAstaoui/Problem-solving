@@ -1,0 +1,52 @@
+#include <iostream>
+ 
+using namespace std;
+ 
+#define end(t) cout << (t ? "Bob" : "Alice"); return 0
+ 
+int main()
+{
+    int N;
+    cin >> N;
+    
+    int data[N];
+    for(int n=0;n<N;n++)
+        cin >> data[n];
+        
+    int i,j;
+    for(i=0;i+1<N && data[i] < data[i+1];i++);
+    for(j=N-1;j-1>=0 && data[j] < data[j-1];j--);
+    
+    int a=0,b=N-1;
+    bool t = 0;
+    while(a <= i && j <= b)
+    {
+        if(data[a] == data[b])
+        {
+            if((i-a+1) % 2 == 0 && (b-j+1) % 2 == 0)
+                t = !t;
+            end(t);
+        }
+        if(data[a] < data[b])
+        {
+            if((b-j+1)%2)
+            {
+                end(t);
+            }
+            a++;
+        }
+        else
+        {
+            if((i-a+1)%2)
+            {
+                end(t);
+            }
+            b--;
+        }
+        t = !t;
+    }
+    
+    if((i < a && (b-j+1) % 2 == 0)  || (b < j && (i-a+1) % 2 == 0))
+        t = !t;
+    end(t);
+}

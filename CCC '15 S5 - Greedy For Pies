@@ -1,0 +1,57 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int NMAX = 3e3 , MMAX = 1e2;
+
+int N,M;
+int A[NMAX+2];
+int B[MMAX+2];
+int dp[NMAX+2][MMAX+2][MMAX+2][2];
+
+int best(int n,int l,int r,bool ok)
+{
+    if(dp[n][l][r][ok]!=-1)return dp[n][l][r][ok];
+
+    if(n==N+1)
+    {
+        if(l<=r) return dp[n][l][r][ok] = ok ? B[r] + best(n,l,r-1,false) : best(n,l+1,r,true);
+        return dp[n][l][r][ok] = 0;
+    }
+
+    int ans = 0;
+
+    if(ok)
+    {
+        ans = max(best(n,l,r,false),A[n]+best(n+1,l,r,false));
+        if(l<=r)
+            ans = max(ans,B[r]+best(n,l,r-1,false));
+    }
+    else
+    {
+        ans = best(n+1,l,r,true);
+        if(l<=r)
+            ans = max(ans,best(n,l+1,r,true));
+    }
+
+    return dp[n][l][r][ok] = ans;
+}
+
+int main()
+{
+    scanf("%d",&N);
+    for(int n=1;n<=N;n++)
+        scanf("%d",&A[n]);
+
+    scanf("%d",&M);
+    for(int m=1;m<=M;m++)
+        scanf("%d",&B[m]);
+
+    memset(dp,-1,sizeof dp);
+
+    sort(B+1,B+1+M);
+
+    printf("%d",best(1,1,M,true));
+
+    return 0;
+}

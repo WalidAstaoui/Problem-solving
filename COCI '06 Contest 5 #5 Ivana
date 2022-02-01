@@ -1,0 +1,55 @@
+#include <cstdio>
+
+using namespace std;
+
+#define min(a,b) (a<b?a:b)
+#define max(a,b) (a>b?a:b)
+
+int N;
+int arr[100];
+int dp[100][100];
+
+int s(int x)
+{
+    return (x+1)%N;
+}
+int p(int x)
+{
+    return (x+N-1)%N;
+}
+
+int best(int i,int j)
+{
+    if(dp[i][j]!=-1)return dp[i][j];
+    if(i==j)return dp[i][j] = (arr[i]%2);
+    if(s(i)==j)return dp[i][j] = (best(i,i) || best(j,j));
+    return dp[i][j] = max((arr[i]%2) + min(best(s(i),p(j)),best(s(s(i)),j)),(arr[j]%2) + min(best(s(i),p(j)),best(i,p(p(j)))));
+}
+
+int main()
+{
+    scanf("%d",&N);
+    for(int i=0;i<N;i++)
+        for(int j=0;j<N;j++)
+            dp[i][j] = -1;
+
+    int S = 0;
+
+    for(int n=0;n<N;n++)
+    {
+        scanf("%d",&arr[n]);
+        S += (arr[n]%2);
+    }
+
+    int cnt = 0;
+
+    for(int n=0;n<N;n++)
+    {
+        int b = (int)(arr[n]%2) + + min(best(s(n),p(p(n))),best(s(s(n)),p(n)) );
+        cnt += ((2*b) > S);
+    }
+
+    printf("%d",cnt);
+
+    return 0;
+}

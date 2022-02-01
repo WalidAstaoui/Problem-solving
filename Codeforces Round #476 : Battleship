@@ -1,0 +1,84 @@
+#include <iostream>
+#include <deque>
+ 
+using namespace std;
+ 
+string grid[101];
+int occ[101][101];
+int N,K;
+ 
+int main()
+{
+    ios::sync_with_stdio(false);
+ 
+    cin >> N >> K;
+ 
+    for(int y=0;y<N;grid[y][N]='#',grid[N][y]='#',y++)
+        cin >> grid[y];
+ 
+    for(int y=0;y<N;y++)
+    {
+        deque<int> group;
+        for(int x=0;x<N+1;x++)
+        {
+            if(grid[y][x]=='.')
+                group.push_back(x);
+            else
+            {
+                int l = group.size();
+ 
+                int M = min(K,l-K+1);
+                int i = 1;
+                while(!group.empty())
+                {
+                    occ[y][group.front()] += max(0,min(i,M));
+                    group.pop_front();
+                    if(group.empty())break;
+                    occ[y][group.back()] += max(0,min(i,M));
+                    group.pop_back();
+                    i++;
+                }
+            }
+        }
+    }
+ 
+    for(int x=0;x<N;x++)
+    {
+        deque<int> group;
+        for(int y=0;y<N+1;y++)
+        {
+            if(grid[y][x]=='.')
+                group.push_back(y);
+            else
+            {
+                int l = group.size();
+ 
+                int M = min(K,l-K+1);
+                int i = 1;
+                while(!group.empty())
+                {
+                    occ[group.front()][x] += max(0,min(i,M));
+                    group.pop_front();
+                    if(group.empty())break;
+                    occ[group.back()][x] += max(0,min(i,M));
+                    group.pop_back();
+                    i++;
+                }
+            }
+        }
+    }
+ 
+    int Y=0,X=0;
+ 
+    for(int y=0;y<N;y++)
+        for(int x=0;x<N;x++)
+            if(occ[y][x] > occ[Y][X])
+            {
+                Y = y;
+                X = x;
+            }
+ 
+    cout << Y+1 << ' ' << X+1;
+ 
+    return 0;
+}
